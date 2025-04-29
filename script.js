@@ -29,6 +29,15 @@ document.getElementById('send-button').addEventListener('click', function() {
         });
         userMessage.appendChild(ttsIcon);
 
+        // Add timestamp
+        const timestamp = document.createElement('span');
+        const now = new Date();
+        timestamp.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        timestamp.style.fontSize = '12px';
+        timestamp.style.color = '#ccc';
+        timestamp.style.marginLeft = '10px';
+        userMessage.appendChild(timestamp);
+
         chatWindow.appendChild(userMessage);
 
         // Clear input field
@@ -60,6 +69,14 @@ document.getElementById('send-button').addEventListener('click', function() {
                 speechSynthesis.speak(utterance);
             });
             aiMessage.appendChild(aiTtsIcon);
+
+            // Add timestamp for AI response
+            const aiTimestamp = document.createElement('span');
+            aiTimestamp.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            aiTimestamp.style.fontSize = '12px';
+            aiTimestamp.style.color = '#ccc';
+            aiTimestamp.style.marginLeft = '10px';
+            aiMessage.appendChild(aiTimestamp);
 
             chatWindow.appendChild(aiMessage);
 
