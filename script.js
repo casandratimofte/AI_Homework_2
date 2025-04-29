@@ -44,6 +44,21 @@ document.getElementById('send-button').addEventListener('click', function() {
     }
 });
 
+// Add a dark mode toggle button
+document.body.insertAdjacentHTML('beforeend', `
+    <button id="dark-mode-toggle" style="position: fixed; top: 10px; right: 10px; padding: 10px; border: none; border-radius: 5px; background-color: #ff69b4; color: #fff; cursor: pointer;">Toggle Dark Mode</button>
+`);
+
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    document.getElementById('chat-container').classList.toggle('dark-mode');
+    document.getElementById('chat-window').classList.toggle('dark-mode');
+    document.getElementById('input-container').classList.toggle('dark-mode');
+    document.getElementById('chat-input').classList.toggle('dark-mode');
+    document.getElementById('send-button').classList.toggle('dark-mode');
+});
+
 // Animation for fading in messages
 const style = document.createElement('style');
 style.textContent = `
