@@ -1,87 +1,85 @@
 // JavaScript to handle chat UI interactions with animations
 
-// Function to send a message to the backend and display the response
-async function sendMessageToBackend(message) {
-    try {
-        // Add debugging logs to capture fetch request details
-        console.log('Sending request to backend:', 'http://127.0.0.1:5000/chat', { message });
+// Select DOM elements
+const chatInput = document.getElementById('chat-input');
+const sendButton = document.getElementById('send-button');
+const chatWindow = document.getElementById('chat-window');
 
-        const response = await fetch('http://127.0.0.1:5000/chat', {
+// Update the backend URL to ensure it is correct
+const BACKEND_URL = 'http://127.0.0.1:5000';
+
+// Function to append messages to the chat window
+function appendMessage(sender, message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = sender;
+    messageDiv.textContent = `${sender}: ${message}`;
+    chatWindow.appendChild(messageDiv);
+}
+
+// Function to send a message to the backend
+async function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    // Append user message to the chat window
+    appendMessage('User', message);
+
+    try {
+        // Send message to the backend
+        const response = await fetch(`${BACKEND_URL}/chat`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message })
+            body: JSON.stringify({ message }),
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch AI response');
+        if (response.ok) {
+            const data = await response.json();
+            // Append AI response to the chat window
+            appendMessage('AI', data.response);
+        } else {
+            console.error('Error communicating with the backend:', response.statusText);
         }
-
-        const data = await response.json();
-
-        // Log the response status and data
-        console.log('Response status:', response.status);
-        console.log('Response data:', data);
-
-        return data;
     } catch (error) {
         console.error('Error:', error);
-        return { error: 'Failed to connect to the server' };
+        alert('Failed to connect to the backend. Please ensure the server is running.');
+    }
+
+    // Clear the input field
+    chatInput.value = '';
+}
+
+// Function to fetch chat history
+async function fetchChatHistory() {
+    try {
+        const response = await fetch(`${BACKEND_URL}/history`);
+        if (response.ok) {
+            const data = await response.json();
+            data.history.forEach(chat => {
+                appendMessage(chat.sender, chat.message);
+            });
+        } else {
+            console.error('Error fetching chat history:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to fetch chat history. Please ensure the server is running.');
     }
 }
 
-// Update the send button click handler to integrate with the backend
-document.getElementById('send-button').addEventListener('click', async function() {
-    const inputField = document.getElementById('chat-input');
-    const message = inputField.value.trim();
+// Event listener for the send button
+sendButton.addEventListener('click', sendMessage);
 
-    if (message) {
-        const chatWindow = document.getElementById('chat-window');
-
-        // Add user message to chat window
-        const userMessage = document.createElement('div');
-        userMessage.textContent = message;
-        userMessage.style.textAlign = 'right';
-        userMessage.style.margin = '10px 0';
-        userMessage.style.padding = '10px';
-        userMessage.style.backgroundColor = '#ff69b4';
-        userMessage.style.color = '#fff';
-        userMessage.style.borderRadius = '10px';
-        userMessage.style.display = 'inline-block';
-        userMessage.style.animation = 'fadeIn 0.5s ease';
-        chatWindow.appendChild(userMessage);
-
-        // Clear input field
-        inputField.value = '';
-
-        // Scroll to the bottom of the chat window
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-
-        // Get AI response from backend
-        const data = await sendMessageToBackend(message);
-
-        if (data.error) {
-            alert(data.error);
-            return;
-        }
-
-        // Add AI response to chat window
-        const aiMessage = document.createElement('div');
-        aiMessage.textContent = data.ai_response;
-        aiMessage.style.textAlign = 'left';
-        aiMessage.style.margin = '10px 0';
-        aiMessage.style.padding = '10px';
-        aiMessage.style.backgroundColor = '#ffe4e1';
-        aiMessage.style.color = '#000';
-        aiMessage.style.borderRadius = '10px';
-        aiMessage.style.display = 'inline-block';
-        aiMessage.style.animation = 'fadeIn 0.5s ease';
-        chatWindow.appendChild(aiMessage);
-
-        chatWindow.scrollTop = chatWindow.scrollHeight;
+// Event listener for pressing Enter in the input field
+chatInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        sendMessage();
     }
 });
+
+// Fetch chat history on page load
+window.onload = fetchChatHistory;
 
 // Add a dark mode toggle button
 document.body.insertAdjacentHTML('beforeend', `
