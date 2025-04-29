@@ -2,27 +2,34 @@
 
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 import openai
 from dotenv import load_dotenv
 import os
 
+# Initialize Flask app
 app = Flask(__name__)
-
-# Configure database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat_history.db'
-db = SQLAlchemy(app)
+CORS(app)
 
 # Load environment variables
 load_dotenv()
-
-# Get OpenAI API key from environment
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-# Chat history model
+# Configure database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/chat_history.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# Define ChatHistory model
 class ChatHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_message = db.Column(db.String(500), nullable=False)
     ai_response = db.Column(db.String(500), nullable=False)
+
+# Initialize database
+with app.app_context():
+    db.create_all()
 
 # Route to handle chat messages
 @app.route('/chat', methods=['POST'])
@@ -35,13 +42,16 @@ def chat():
 
     try:
         # Get AI response from OpenAI
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=f"You are a helpful assistant. {user_message}",
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": user_message}
+            ],
             max_tokens=150,
             temperature=0.7
         )
-        ai_response = response.choices[0].text.strip()
+        ai_response = response['choices'][0]['message']['content'].strip()
 
         # Save to database
         chat_entry = ChatHistory(user_message=user_message, ai_response=ai_response)
@@ -58,6 +68,13 @@ def history():
     history = ChatHistory.query.all()
     return jsonify([{"user_message": entry.user_message, "ai_response": entry.ai_response} for entry in history])
 
+# Route to check API key
+@app.route('/check_api_key', methods=['GET'])
+def check_api_key():
+    if openai.api_key:
+        return jsonify({"status": "success", "message": "API key is set."})
+    else:
+        return jsonify({"status": "error", "message": "API key is not set."}), 400
+
 if __name__ == '__main__':
-    db.create_all()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

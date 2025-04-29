@@ -1,5 +1,30 @@
 // JavaScript to handle chat UI interactions with animations
-document.getElementById('send-button').addEventListener('click', function() {
+
+// Function to send a message to the backend and display the response
+async function sendMessageToBackend(message) {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch AI response');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        return { error: 'Failed to connect to the server' };
+    }
+}
+
+// Update the send button click handler to integrate with the backend
+document.getElementById('send-button').addEventListener('click', async function() {
     const inputField = document.getElementById('chat-input');
     const message = inputField.value.trim();
 
@@ -17,27 +42,6 @@ document.getElementById('send-button').addEventListener('click', function() {
         userMessage.style.borderRadius = '10px';
         userMessage.style.display = 'inline-block';
         userMessage.style.animation = 'fadeIn 0.5s ease';
-
-        // Add text-to-speech icon
-        const ttsIcon = document.createElement('span');
-        ttsIcon.textContent = '🔊';
-        ttsIcon.style.cursor = 'pointer';
-        ttsIcon.style.marginLeft = '10px';
-        ttsIcon.addEventListener('click', () => {
-            const utterance = new SpeechSynthesisUtterance(message);
-            speechSynthesis.speak(utterance);
-        });
-        userMessage.appendChild(ttsIcon);
-
-        // Add timestamp
-        const timestamp = document.createElement('span');
-        const now = new Date();
-        timestamp.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        timestamp.style.fontSize = '12px';
-        timestamp.style.color = '#ccc';
-        timestamp.style.marginLeft = '10px';
-        userMessage.appendChild(timestamp);
-
         chatWindow.appendChild(userMessage);
 
         // Clear input field
@@ -46,42 +50,28 @@ document.getElementById('send-button').addEventListener('click', function() {
         // Scroll to the bottom of the chat window
         chatWindow.scrollTop = chatWindow.scrollHeight;
 
-        // Placeholder for AI response (to be implemented later)
-        setTimeout(() => {
-            const aiMessage = document.createElement('div');
-            aiMessage.textContent = 'AI response goes here...';
-            aiMessage.style.textAlign = 'left';
-            aiMessage.style.margin = '10px 0';
-            aiMessage.style.padding = '10px';
-            aiMessage.style.backgroundColor = '#ffe4e1';
-            aiMessage.style.color = '#000';
-            aiMessage.style.borderRadius = '10px';
-            aiMessage.style.display = 'inline-block';
-            aiMessage.style.animation = 'fadeIn 0.5s ease';
+        // Get AI response from backend
+        const data = await sendMessageToBackend(message);
 
-            // Add text-to-speech icon for AI response
-            const aiTtsIcon = document.createElement('span');
-            aiTtsIcon.textContent = '🔊';
-            aiTtsIcon.style.cursor = 'pointer';
-            aiTtsIcon.style.marginLeft = '10px';
-            aiTtsIcon.addEventListener('click', () => {
-                const utterance = new SpeechSynthesisUtterance(aiMessage.textContent);
-                speechSynthesis.speak(utterance);
-            });
-            aiMessage.appendChild(aiTtsIcon);
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
 
-            // Add timestamp for AI response
-            const aiTimestamp = document.createElement('span');
-            aiTimestamp.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            aiTimestamp.style.fontSize = '12px';
-            aiTimestamp.style.color = '#ccc';
-            aiTimestamp.style.marginLeft = '10px';
-            aiMessage.appendChild(aiTimestamp);
+        // Add AI response to chat window
+        const aiMessage = document.createElement('div');
+        aiMessage.textContent = data.ai_response;
+        aiMessage.style.textAlign = 'left';
+        aiMessage.style.margin = '10px 0';
+        aiMessage.style.padding = '10px';
+        aiMessage.style.backgroundColor = '#ffe4e1';
+        aiMessage.style.color = '#000';
+        aiMessage.style.borderRadius = '10px';
+        aiMessage.style.display = 'inline-block';
+        aiMessage.style.animation = 'fadeIn 0.5s ease';
+        chatWindow.appendChild(aiMessage);
 
-            chatWindow.appendChild(aiMessage);
-
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }, 1000);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 });
 
