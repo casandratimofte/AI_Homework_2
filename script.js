@@ -17,6 +17,18 @@ document.getElementById('send-button').addEventListener('click', function() {
         userMessage.style.borderRadius = '10px';
         userMessage.style.display = 'inline-block';
         userMessage.style.animation = 'fadeIn 0.5s ease';
+
+        // Add text-to-speech icon
+        const ttsIcon = document.createElement('span');
+        ttsIcon.textContent = '🔊';
+        ttsIcon.style.cursor = 'pointer';
+        ttsIcon.style.marginLeft = '10px';
+        ttsIcon.addEventListener('click', () => {
+            const utterance = new SpeechSynthesisUtterance(message);
+            speechSynthesis.speak(utterance);
+        });
+        userMessage.appendChild(ttsIcon);
+
         chatWindow.appendChild(userMessage);
 
         // Clear input field
@@ -37,6 +49,18 @@ document.getElementById('send-button').addEventListener('click', function() {
             aiMessage.style.borderRadius = '10px';
             aiMessage.style.display = 'inline-block';
             aiMessage.style.animation = 'fadeIn 0.5s ease';
+
+            // Add text-to-speech icon for AI response
+            const aiTtsIcon = document.createElement('span');
+            aiTtsIcon.textContent = '🔊';
+            aiTtsIcon.style.cursor = 'pointer';
+            aiTtsIcon.style.marginLeft = '10px';
+            aiTtsIcon.addEventListener('click', () => {
+                const utterance = new SpeechSynthesisUtterance(aiMessage.textContent);
+                speechSynthesis.speak(utterance);
+            });
+            aiMessage.appendChild(aiTtsIcon);
+
             chatWindow.appendChild(aiMessage);
 
             chatWindow.scrollTop = chatWindow.scrollHeight;

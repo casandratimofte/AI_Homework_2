@@ -114,3 +114,15 @@ body.dark-mode {
 #send-button.dark-mode:hover {
     background-color: #555;
 }
+
+/* Style for the text-to-speech icon */
+span {
+    font-size: 18px;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+span:hover {
+    transform: scale(1.2);
+}
