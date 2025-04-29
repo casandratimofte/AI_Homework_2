@@ -1,13 +1,13 @@
-/* General styles for the chat UI */
+/* Children's themed styles for the chat UI */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f4f4f4;
+    background-color: #ffefd5; /* Light pastel yellow */
 }
 
 #chat-container {
@@ -16,44 +16,65 @@ body {
     height: 80%;
     display: flex;
     flex-direction: column;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: 5px solid #ff69b4; /* Hot pink border */
+    border-radius: 15px;
     background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: bounceIn 1s ease;
 }
 
 #chat-window {
     flex: 1;
     padding: 10px;
     overflow-y: auto;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 3px dashed #ff69b4; /* Dashed pink border */
+    background: linear-gradient(to bottom, #ffefd5, #ffe4e1); /* Gradient background */
 }
 
 #input-container {
     display: flex;
     padding: 10px;
-    border-top: 1px solid #ccc;
+    border-top: 3px dashed #ff69b4;
+    background-color: #ffe4e1; /* Light pink */
 }
 
 #chat-input {
     flex: 1;
     padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 2px solid #ff69b4;
+    border-radius: 10px;
     font-size: 16px;
+    background-color: #fffaf0; /* Floral white */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #send-button {
     margin-left: 10px;
     padding: 10px 20px;
     border: none;
-    border-radius: 4px;
-    background-color: #007bff;
+    border-radius: 10px;
+    background-color: #ff69b4;
     color: #fff;
     font-size: 16px;
     cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
 }
 
 #send-button:hover {
-    background-color: #0056b3;
+    background-color: #ff1493; /* Deep pink */
+    transform: scale(1.1);
+}
+
+/* Animations */
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
