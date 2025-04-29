@@ -3,6 +3,9 @@
 // Function to send a message to the backend and display the response
 async function sendMessageToBackend(message) {
     try {
+        // Add debugging logs to capture fetch request details
+        console.log('Sending request to backend:', 'http://127.0.0.1:5000/chat', { message });
+
         const response = await fetch('http://127.0.0.1:5000/chat', {
             method: 'POST',
             headers: {
@@ -16,6 +19,11 @@ async function sendMessageToBackend(message) {
         }
 
         const data = await response.json();
+
+        // Log the response status and data
+        console.log('Response status:', response.status);
+        console.log('Response data:', data);
+
         return data;
     } catch (error) {
         console.error('Error:', error);
