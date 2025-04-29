@@ -100,6 +100,40 @@ darkModeToggle.addEventListener('click', () => {
     document.getElementById('send-button').classList.toggle('dark-mode');
 });
 
+// Add export and copy buttons
+document.body.insertAdjacentHTML('beforeend', `
+    <div id="export-container">
+        <button id="copy-button">Copy Chat</button>
+        <button id="export-button">Export as PDF</button>
+    </div>
+`);
+
+// Copy chat to clipboard
+document.getElementById('copy-button').addEventListener('click', () => {
+    const chatWindow = document.getElementById('chat-window');
+    const chatText = Array.from(chatWindow.children).map(child => child.textContent).join('\n');
+    navigator.clipboard.writeText(chatText).then(() => {
+        alert('Chat copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy chat:', err);
+    });
+});
+
+// Export chat as PDF
+document.getElementById('export-button').addEventListener('click', () => {
+    const chatWindow = document.getElementById('chat-window');
+    const chatText = Array.from(chatWindow.children).map(child => child.textContent).join('\n');
+
+    const doc = new jsPDF();
+    doc.text(chatText, 10, 10);
+    doc.save('chat.pdf');
+});
+
+// Load jsPDF library dynamically
+const script = document.createElement('script');
+script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js';
+document.head.appendChild(script);
+
 // Animation for fading in messages
 const style = document.createElement('style');
 style.textContent = `
@@ -112,3 +146,36 @@ style.textContent = `
     }
 }`;
 document.head.appendChild(style);
+
+// Add chat history panel and toggle button
+document.body.insertAdjacentHTML('beforeend', `
+    <button id="chat-history-toggle">History</button>
+    <div id="chat-history-panel">
+        <ul id="chat-history-list">
+            <!-- Chat history items will be dynamically added here -->
+        </ul>
+    </div>
+`);
+
+const chatHistoryToggle = document.getElementById('chat-history-toggle');
+const chatHistoryPanel = document.getElementById('chat-history-panel');
+
+// Toggle chat history panel visibility
+chatHistoryToggle.addEventListener('click', () => {
+    chatHistoryPanel.classList.toggle('open');
+});
+
+// Function to save chat history
+function saveChatHistory(threadName, messages) {
+    const chatHistoryList = document.getElementById('chat-history-list');
+    const listItem = document.createElement('li');
+    listItem.textContent = threadName;
+    listItem.addEventListener('click', () => {
+        alert(`Loading chat thread: ${threadName}`); // Placeholder for loading functionality
+    });
+    chatHistoryList.appendChild(listItem);
+}
+
+// Example usage of saveChatHistory
+saveChatHistory('Thread 1', ['Hello', 'How are you?']);
+saveChatHistory('Thread 2', ['What is the weather today?', 'It is sunny.']);
